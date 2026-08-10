@@ -1,8 +1,8 @@
 const CACHE_NAME = 'digibeat-v1';
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
+  './',
+  './index.html',
+  './manifest.json',
 ];
 
 // Install event - cache static assets
@@ -66,7 +66,7 @@ self.addEventListener('fetch', (event) => {
       }).catch(() => {
         // Offline fallback for navigation requests
         if (event.request.mode === 'navigate') {
-          return caches.match('/index.html');
+          return caches.match('./index.html') || caches.match('./');
         }
         return new Response('Offline', { status: 503 });
       });
