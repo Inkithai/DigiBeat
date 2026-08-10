@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { usePomodoro } from '../hooks/useTime';
 import { useClock } from '../ClockContext';
 import { TimerDisplay } from '../components/DateDisplay';
@@ -9,6 +10,12 @@ export function PomodoroPage() {
   const { settings } = useClock();
   const { primary, glow } = COLORS[settings.color];
   const pomodoro = usePomodoro(25, 5);
+
+  // Apply background theme
+  useEffect(() => {
+    document.documentElement.setAttribute('data-bg', settings.backgroundTheme);
+    document.documentElement.setAttribute('data-high-contrast', String(settings.highContrast));
+  }, [settings.backgroundTheme, settings.highContrast]);
 
   return (
     <div className="page pomodoro-page">

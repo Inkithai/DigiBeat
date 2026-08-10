@@ -1,4 +1,3 @@
-import { COLORS } from '../types';
 import { useClock } from '../ClockContext';
 
 export function FullscreenButton() {
@@ -13,7 +12,8 @@ export function FullscreenButton() {
   return (
     <button
       onClick={toggleFullscreen}
-      aria-label="Toggle fullscreen"
+      aria-label="Toggle fullscreen mode"
+      aria-keyshortcuts="F"
       style={{
         background: 'rgba(255,255,255,0.1)',
         border: '1px solid rgba(255,255,255,0.2)',
@@ -21,7 +21,7 @@ export function FullscreenButton() {
         padding: '12px 16px',
         color: 'white',
         cursor: 'pointer',
-        fontSize: '1.2rem',
+        fontSize: '1rem',
         backdropFilter: 'blur(10px)',
         transition: 'all 0.2s ease',
       }}
@@ -32,7 +32,7 @@ export function FullscreenButton() {
 }
 
 export function WakeLockStatus() {
-  const { wakeLockStatus } = useClock();
+  const { wakeLockStatus, requestWakeLock } = useClock();
 
   if (wakeLockStatus === 'unsupported') {
     return null;
@@ -41,29 +41,15 @@ export function WakeLockStatus() {
   const isActive = wakeLockStatus === 'active';
   
   return (
-    <div 
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        padding: '8px 16px',
-        background: isActive ? 'rgba(0,255,136,0.2)' : 'rgba(255,255,255,0.1)',
-        borderRadius: '20px',
-        fontSize: '0.85rem',
-        color: isActive ? '#00ff88' : 'rgba(255,255,255,0.6)',
-      }}
+    <button
+      onClick={requestWakeLock}
+      aria-label={isActive ? 'Screen will stay awake' : 'Click to keep screen awake'}
+      className={`wake-lock-status ${isActive ? 'active' : 'inactive'}`}
+      title={isActive ? 'Screen will stay awake' : 'Click to keep screen awake'}
     >
-      <div 
-        style={{
-          width: '8px',
-          height: '8px',
-          borderRadius: '50%',
-          background: isActive ? '#00ff88' : 'rgba(255,255,255,0.4)',
-          boxShadow: isActive ? '0 0 8px #00ff88' : 'none',
-        }}
-      />
-      {isActive ? 'Screen Awake' : 'Screen Lock Off'}
-    </div>
+      <span className="wake-lock-dot" />
+      {isActive ? 'Screen Awake' : 'Keep Awake'}
+    </button>
   );
 }
 
@@ -78,8 +64,8 @@ interface ButtonProps {
 
 export function Button({ children, onClick, variant = 'secondary', size = 'medium', disabled = false, color }: ButtonProps) {
   const { settings } = useClock();
-  const primaryColor = color || COLORS[settings.color].primary;
-  const glow = color || COLORS[settings.color].glow;
+  const primaryColor = color || (settings.highContrast ? '#ffffff' : '#00ff88');
+  const glow = color || (settings.highContrast ? '#ffffff' : 'rgba(0,255,136,0.8)');
 
   const baseStyles: React.CSSProperties = {
     padding: size === 'small' ? '8px 16px' : size === 'large' ? '16px 32px' : '12px 24px',

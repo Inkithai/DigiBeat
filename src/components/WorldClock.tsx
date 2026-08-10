@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { CITIES, City, COLORS } from '../types';
 import { useClock } from '../ClockContext';
 
@@ -11,13 +11,15 @@ export function WorldClock() {
   ]);
   const [search, setSearch] = useState('');
   const [showPicker, setShowPicker] = useState(false);
-  const [, forceUpdate] = useState({});
+  const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Force re-render every second
-  useState(() => {
-    const interval = setInterval(() => forceUpdate({}), 1000);
+  // Update time every second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
     return () => clearInterval(interval);
-  });
+  }, []);
 
   const filteredCities = useMemo(() => {
     return CITIES.filter(city => 
@@ -38,7 +40,7 @@ export function WorldClock() {
 
   const getTimeInCity = (timezone: string) => {
     try {
-      return new Date().toLocaleTimeString('en-US', {
+      return currentTime.toLocaleTimeString('en-US', {
         timeZone: timezone,
         hour: '2-digit',
         minute: '2-digit',
@@ -52,7 +54,7 @@ export function WorldClock() {
 
   const getDateInCity = (timezone: string) => {
     try {
-      return new Date().toLocaleDateString('en-US', {
+      return currentTime.toLocaleDateString('en-US', {
         timeZone: timezone,
         weekday: 'short',
         month: 'short',
@@ -65,12 +67,11 @@ export function WorldClock() {
 
   const getOffset = (timezone: string) => {
     try {
-      const now = new Date();
       const formatter = new Intl.DateTimeFormat('en-US', {
         timeZone: timezone,
         timeZoneName: 'shortOffset',
       });
-      const parts = formatter.formatToParts(now);
+      const parts = formatter.formatToParts(currentTime);
       const offsetPart = parts.find(p => p.type === 'timeZoneName');
       return offsetPart?.value || '';
     } catch {
@@ -80,9 +81,8 @@ export function WorldClock() {
 
   const getDayOffset = (timezone: string) => {
     try {
-      const localDate = new Date();
-      const cityDate = new Date(localDate.toLocaleString('en-US', { timeZone: timezone }));
-      const localDay = localDate.getDate();
+      const cityDate = new Date(currentTime.toLocaleString('en-US', { timeZone: timezone }));
+      const localDay = currentTime.getDate();
       const cityDay = cityDate.getDate();
       
       if (cityDay > localDay) return 'Tomorrow';
@@ -131,6 +131,7 @@ export function WorldClock() {
             placeholder="Search cities..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            autoFocus
             style={{
               width: '100%',
               padding: '12px 16px',
@@ -159,6 +160,7 @@ export function WorldClock() {
                   cursor: 'pointer',
                   borderRadius: '8px',
                   textAlign: 'left',
+                  transition: 'background 0.2s ease',
                 }}
                 onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
                 onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
@@ -167,6 +169,11 @@ export function WorldClock() {
                 <span style={{ opacity: 0.6 }}>{getOffset(city.timezone)}</span>
               </button>
             ))}
+            {filteredCities.length === 0 && (
+              <div style={{ padding: '1rem', textAlign: 'center', color: 'rgba(255,255,255,0.5)' }}>
+                No cities found
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -183,6 +190,7 @@ export function WorldClock() {
               borderRadius: '16px',
               padding: '1.5rem',
               border: '1px solid rgba(255,255,255,0.1)',
+              transition: 'all 0.3s ease',
             }}
           >
             <div>
@@ -198,7 +206,7 @@ export function WorldClock() {
                 </span>
               </div>
               <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem' }}>
-                {city.country} • {getDateInCity(city.timezone)}
+                {city.country} • {getDateInCity(city.timezone)} • {getOffset(city.timezone)}
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
@@ -215,6 +223,7 @@ export function WorldClock() {
               </div>
               <button
                 onClick={() => removeCity(city.id)}
+                aria-label={`Remove ${city.name}`}
                 style={{
                   background: 'rgba(255,68,68,0.2)',
                   border: 'none',
@@ -223,6 +232,7 @@ export function WorldClock() {
                   color: '#ff4444',
                   cursor: 'pointer',
                   fontSize: '1.2rem',
+                  transition: 'all 0.2s ease',
                 }}
               >
                 ×

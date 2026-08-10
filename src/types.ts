@@ -1,6 +1,8 @@
 export type ClockColor = 'red' | 'green' | 'blue' | 'white' | 'amber' | 'purple' | 'pink' | 'cyan';
 export type ClockStyle = 'digital' | 'flip' | 'pixel' | 'neon' | 'binary';
 export type TimeFormat = '12' | '24';
+export type PresetMode = 'default' | 'minimal' | 'presentation' | 'classroom' | 'bedside' | 'kitchen' | 'streaming';
+export type BackgroundTheme = 'dark' | 'oled' | 'gradient' | 'light' | 'custom';
 
 export interface ClockSettings {
   color: ClockColor;
@@ -9,6 +11,13 @@ export interface ClockSettings {
   showSeconds: boolean;
   showDate: boolean;
   keepScreenOn: boolean;
+  preset: PresetMode;
+  backgroundTheme: BackgroundTheme;
+  customBackground: string;
+  autoHideControls: boolean;
+  reducedMotion: boolean;
+  highContrast: boolean;
+  fontSize: 'small' | 'medium' | 'large' | 'xlarge';
 }
 
 export interface City {
@@ -34,6 +43,72 @@ export interface PomodoroState {
   session: number;
 }
 
+export const PRESETS: Record<PresetMode, Partial<ClockSettings>> = {
+  default: {
+    showSeconds: true,
+    showDate: true,
+    autoHideControls: false,
+    reducedMotion: false,
+    highContrast: false,
+    fontSize: 'large',
+    backgroundTheme: 'dark',
+  },
+  minimal: {
+    showSeconds: true,
+    showDate: false,
+    autoHideControls: true,
+    reducedMotion: true,
+    highContrast: false,
+    fontSize: 'xlarge',
+    backgroundTheme: 'oled',
+  },
+  presentation: {
+    showSeconds: true,
+    showDate: true,
+    autoHideControls: true,
+    reducedMotion: false,
+    highContrast: false,
+    fontSize: 'xlarge',
+    backgroundTheme: 'dark',
+  },
+  classroom: {
+    showSeconds: true,
+    showDate: true,
+    autoHideControls: false,
+    reducedMotion: false,
+    highContrast: false,
+    fontSize: 'large',
+    backgroundTheme: 'gradient',
+  },
+  bedside: {
+    showSeconds: false,
+    showDate: true,
+    autoHideControls: true,
+    reducedMotion: true,
+    highContrast: false,
+    fontSize: 'large',
+    backgroundTheme: 'oled',
+  },
+  kitchen: {
+    showSeconds: true,
+    showDate: false,
+    autoHideControls: false,
+    reducedMotion: false,
+    highContrast: false,
+    fontSize: 'medium',
+    backgroundTheme: 'light',
+  },
+  streaming: {
+    showSeconds: true,
+    showDate: false,
+    autoHideControls: true,
+    reducedMotion: true,
+    highContrast: false,
+    fontSize: 'large',
+    backgroundTheme: 'oled',
+  },
+};
+
 export const COLORS: Record<ClockColor, { primary: string; glow: string }> = {
   red: { primary: '#ff3333', glow: 'rgba(255, 51, 51, 0.8)' },
   green: { primary: '#00ff88', glow: 'rgba(0, 255, 136, 0.8)' },
@@ -43,6 +118,17 @@ export const COLORS: Record<ClockColor, { primary: string; glow: string }> = {
   purple: { primary: '#aa66ff', glow: 'rgba(170, 102, 255, 0.8)' },
   pink: { primary: '#ff66aa', glow: 'rgba(255, 102, 170, 0.8)' },
   cyan: { primary: '#00ffff', glow: 'rgba(0, 255, 255, 0.8)' },
+};
+
+export const HIGH_CONTRAST_COLORS: Record<ClockColor, { primary: string; glow: string }> = {
+  red: { primary: '#ff0000', glow: '#ff0000' },
+  green: { primary: '#00ff00', glow: '#00ff00' },
+  blue: { primary: '#0088ff', glow: '#0088ff' },
+  white: { primary: '#ffffff', glow: '#ffffff' },
+  amber: { primary: '#ffcc00', glow: '#ffcc00' },
+  purple: { primary: '#cc88ff', glow: '#cc88ff' },
+  pink: { primary: '#ff88aa', glow: '#ff88aa' },
+  cyan: { primary: '#00ddff', glow: '#00ddff' },
 };
 
 export const CITIES: City[] = [
@@ -93,3 +179,30 @@ export const CITIES: City[] = [
   { id: 'scl', name: 'Santiago', country: 'Chile', timezone: 'America/Santiago' },
   { id: 'bau', name: 'Buenos Aires', country: 'Argentina', timezone: 'America/Argentina/Buenos_Aires' },
 ];
+
+export const BACKGROUND_THEMES: Record<BackgroundTheme, { name: string; background: string; gradient?: string }> = {
+  dark: { 
+    name: 'Dark', 
+    background: '#0a0a0f',
+    gradient: 'linear-gradient(135deg, #0a0a0f 0%, #12121a 50%, #0a0a0f 100%)',
+  },
+  oled: { 
+    name: 'OLED Black', 
+    background: '#000000',
+    gradient: '#000000',
+  },
+  gradient: { 
+    name: 'Gradient', 
+    background: '#1a1a2e',
+    gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+  },
+  light: { 
+    name: 'Light', 
+    background: '#f5f5f5',
+    gradient: 'linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%)',
+  },
+  custom: { 
+    name: 'Custom', 
+    background: '#0a0a0f',
+  },
+};

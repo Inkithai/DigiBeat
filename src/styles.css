@@ -7,6 +7,7 @@
 }
 
 :root {
+  /* Default theme */
   --bg-primary: #0a0a0f;
   --bg-secondary: #12121a;
   --bg-tertiary: #1a1a25;
@@ -14,7 +15,36 @@
   --text-secondary: rgba(255, 255, 255, 0.7);
   --text-muted: rgba(255, 255, 255, 0.5);
   --border-color: rgba(255, 255, 255, 0.1);
-  --glow-green: rgba(0, 255, 136, 0.5);
+  --glow-color: rgba(0, 255, 136, 0.5);
+  
+  /* Animation settings */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+/* OLED Theme */
+[data-bg="oled"] {
+  --bg-primary: #000000;
+  --bg-secondary: #000000;
+  --bg-tertiary: #0a0a0a;
+}
+
+/* Gradient Theme */
+[data-bg="gradient"] {
+  --bg-primary: #667eea;
+  --bg-secondary: #764ba2;
+  --bg-tertiary: #f093fb;
+}
+
+/* Light Theme */
+[data-bg="light"] {
+  --bg-primary: #f5f5f5;
+  --bg-secondary: #e0e0e0;
+  --text-primary: #1a1a2e;
+  --text-secondary: rgba(26, 26, 46, 0.7);
+  --text-muted: rgba(26, 26, 46, 0.5);
+  --border-color: rgba(0, 0, 0, 0.1);
 }
 
 html, body {
@@ -25,15 +55,42 @@ html, body {
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
+  background: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background var(--transition-normal), color var(--transition-normal);
 }
 
-/* Animated background */
+/* Gradient background overlay */
 body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg-secondary);
+  pointer-events: none;
+  z-index: -1;
+  transition: background var(--transition-normal);
+}
+
+[data-bg="gradient"] body::before {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+}
+
+[data-bg="oled"] body::before {
+  background: #000000;
+}
+
+[data-bg="light"] body::before {
+  background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+}
+
+/* Ambient glow effects */
+body::after {
   content: '';
   position: fixed;
   top: 0;
@@ -63,6 +120,7 @@ body::before {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 /* Header */
@@ -74,6 +132,11 @@ body::before {
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-color);
   padding: 1rem;
+  transition: all var(--transition-normal);
+}
+
+[data-bg="oled"] .header {
+  background: rgba(0, 0, 0, 0.95);
 }
 
 .header-content {
@@ -136,6 +199,54 @@ body::before {
   padding: 2rem;
   color: var(--text-muted);
   font-size: 0.9rem;
+  transition: color var(--transition-normal);
+}
+
+/* Wake Lock Status Badge */
+.wake-lock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all var(--transition-normal);
+}
+
+.wake-lock-badge.active {
+  background: rgba(0, 255, 136, 0.2);
+  color: #00ff88;
+}
+
+.wake-lock-badge.inactive {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+}
+
+.wake-lock-badge.unsupported {
+  display: none;
+}
+
+.wake-lock-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  transition: all var(--transition-normal);
+}
+
+.wake-lock-badge.active .wake-lock-indicator {
+  background: #00ff88;
+  box-shadow: 0 0 8px #00ff88;
+}
+
+/* High Contrast Mode */
+[data-high-contrast="true"] {
+  --glow-color: rgba(255, 255, 255, 0.8);
+}
+
+[data-high-contrast="true"] .clock-display {
+  filter: contrast(1.2);
 }
 
 /* Responsive */
@@ -160,6 +271,48 @@ body::before {
   .clock-wrapper {
     padding: 0 0.5rem;
   }
+}
+
+/* Keyboard shortcuts hint */
+.keyboard-hint {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  backdrop-filter: blur(10px);
+  z-index: 50;
+}
+
+.keyboard-hint kbd {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin: 0 2px;
+}
+
+/* Offline indicator */
+.offline-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #ffaa00;
+  color: #000;
+  text-align: center;
+  padding: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  z-index: 9999;
+  transform: translateY(-100%);
+  transition: transform var(--transition-normal);
+}
+
+.offline-indicator.visible {
+  transform: translateY(0);
 }
 
 /* Utility classes */
@@ -208,12 +361,55 @@ body::before {
   }
 }
 
+@keyframes neonFlicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    opacity: 1;
+  }
+  20%, 24%, 55% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes flipTop {
+  0% {
+    transform: rotateX(0deg);
+  }
+  100% {
+    transform: rotateX(-90deg);
+  }
+}
+
+@keyframes flipBottom {
+  0% {
+    transform: rotateX(90deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
 .animate-fadeIn {
   animation: fadeIn 0.5s ease-out;
 }
 
 .animate-slideUp {
   animation: slideUp 0.5s ease-out;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .animate-fadeIn,
+  .animate-slideUp {
+    animation: none;
+  }
 }
 
 /* Scrollbar styling */
@@ -241,7 +437,7 @@ body::before {
   color: white;
 }
 
-/* Focus states */
+/* Focus states - accessibility */
 :focus-visible {
   outline: 2px solid #00ff88;
   outline-offset: 2px;
@@ -273,28 +469,6 @@ input::placeholder {
   color: var(--text-muted);
 }
 
-/* Screen Wake Lock indicator styles */
-.wake-lock-active {
-  background: rgba(0, 255, 136, 0.2);
-  color: #00ff88;
-}
-
-.wake-lock-inactive {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.6);
-}
-
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
 /* Print styles - hide UI when printing */
 @media print {
   .header,
@@ -308,4 +482,73 @@ input::placeholder {
   .clock-container {
     page-break-inside: avoid;
   }
+}
+
+/* Install PWA prompt */
+.pwa-install-prompt {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #00ff88, #00ccff);
+  color: #000;
+  padding: 16px 24px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  box-shadow: 0 10px 40px rgba(0, 255, 136, 0.4);
+  z-index: 1000;
+  animation: slideUp 0.5s ease-out;
+}
+
+.pwa-install-prompt button {
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background var(--transition-fast);
+}
+
+.pwa-install-prompt button:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Screen Wake Lock status */
+.wake-lock-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+}
+
+.wake-lock-status.active {
+  background: rgba(0, 255, 136, 0.2);
+  color: #00ff88;
+}
+
+.wake-lock-status.inactive {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+}
+
+.wake-lock-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transition: all var(--transition-normal);
+}
+
+.wake-lock-status.active .wake-lock-dot {
+  background: #00ff88;
+  box-shadow: 0 0 8px #00ff88;
+}
+
+.wake-lock-status.inactive .wake-lock-dot {
+  background: rgba(255, 255, 255, 0.4);
 }

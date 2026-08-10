@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useStopwatch } from '../hooks/useTime';
 import { useClock } from '../ClockContext';
 import { StopwatchDisplay } from '../components/DateDisplay';
@@ -9,6 +10,12 @@ export function StopwatchPage() {
   const { settings } = useClock();
   const { primary, glow } = COLORS[settings.color];
   const sw = useStopwatch();
+
+  // Apply background theme
+  useEffect(() => {
+    document.documentElement.setAttribute('data-bg', settings.backgroundTheme);
+    document.documentElement.setAttribute('data-high-contrast', String(settings.highContrast));
+  }, [settings.backgroundTheme, settings.highContrast]);
 
   const formatLapTime = (ms: number) => {
     const hours = Math.floor(ms / 3600000);

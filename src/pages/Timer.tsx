@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTimer } from '../hooks/useTime';
 import { useClock } from '../ClockContext';
 import { TimerDisplay } from '../components/DateDisplay';
@@ -12,6 +12,12 @@ export function TimerPage() {
   const [initialMinutes, setInitialMinutes] = useState(25);
   const [inputMinutes, setInputMinutes] = useState('25');
   const timer = useTimer(initialMinutes);
+
+  // Apply background theme
+  useEffect(() => {
+    document.documentElement.setAttribute('data-bg', settings.backgroundTheme);
+    document.documentElement.setAttribute('data-high-contrast', String(settings.highContrast));
+  }, [settings.backgroundTheme, settings.highContrast]);
 
   const handleSetTime = () => {
     const mins = parseInt(inputMinutes) || 0;
@@ -98,6 +104,7 @@ export function TimerPage() {
                     borderRadius: '8px',
                     cursor: 'pointer',
                     fontSize: '0.9rem',
+                    transition: 'all 0.2s ease',
                   }}
                 >
                   {mins}m
@@ -113,6 +120,7 @@ export function TimerPage() {
                 placeholder="Minutes"
                 min="1"
                 max="999"
+                aria-label="Custom minutes"
                 style={{
                   width: '100px',
                   padding: '12px',
@@ -136,6 +144,9 @@ export function TimerPage() {
         @keyframes pulse {
           0%, 100% { opacity: 1; transform: scale(1); }
           50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .pulse { animation: none; }
         }
       `}</style>
     </div>
