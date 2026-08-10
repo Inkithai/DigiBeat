@@ -11,6 +11,7 @@ export function Navigation() {
     { path: '/', label: 'Clock' },
     { path: '/timer', label: 'Timer' },
     { path: '/stopwatch', label: 'Stopwatch' },
+    { path: '/alarm', label: 'Alarm' },
     { path: '/pomodoro', label: 'Pomodoro' },
     { path: '/world-clock', label: 'World Clock' },
   ];
